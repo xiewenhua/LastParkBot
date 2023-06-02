@@ -13,7 +13,7 @@ my_chat_id = all_variables.get('MY_CHAT_ID')
 github_run_id = str(all_variables.get('GITHUB_RUN_ID'))
 runtime = 3
 if "GITHUB_ACTIONS" in all_variables:
-    runtime = int(all_variables.get('RUNTIME')) * 3600
+    runtime = float(all_variables.get('RUNTIME')) * 3600
 
 
 def get_beijing_time():
