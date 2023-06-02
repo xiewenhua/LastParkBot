@@ -13,14 +13,16 @@ my_chat_id = all_variables.get('MY_CHAT_ID')
 github_run_id = str(all_variables.get('GITHUB_RUN_ID'))
 runtime = 3
 if "GITHUB_ACTIONS" in all_variables:
-    runtime = int( all_variables.get('RUNTIME')) * 3600
+    runtime = int(all_variables.get('RUNTIME')) * 3600
+
 
 def get_beijing_time():
     timezone = pytz.timezone('Asia/Shanghai')
-    now = datetime.datetime.now(timezone)
+    now = datetime.datetime.now()
     return now
 
 
+@bot.message_handler(commands=['stop'])
 def exit_program():
     end_message = log_message('本次服务已结束')
     bot.send_message(my_chat_id, end_message)
@@ -30,7 +32,8 @@ def exit_program():
 
 def log_message(message):
     beijing_time = get_beijing_time()
-    message = github_run_id + ' ' + beijing_time.strftime("%Y-%m-%d %H:%M:%S") + ' ' + message
+    message = github_run_id + ' ' + \
+        beijing_time.strftime("%Y-%m-%d %H:%M:%S") + ' ' + message
     return message
 
 
@@ -43,10 +46,12 @@ def send_welcome(message):
 def echo_all(message):
     bot.reply_to(message, message.text)
 
+
 def start_program():
     start_message = log_message('服务已启动')
     bot.send_message(my_chat_id, start_message)
     print(start_message)
+
 
 start_program()
 

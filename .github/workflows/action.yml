@@ -2,18 +2,24 @@ name: 机器人后端服务
 run-name: ${{ github.actor }} 简单机器人应答
 on:
   schedule:
-    - cron: '*/5 * * * *'
+    - cron: "* */3 * * *"
   push:
+    branches:
+      - dev
+  workflow_dispatch:
 
 env:
   BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
   MY_CHAT_ID: ${{ secrets.MY_CHAT_ID }}
-  RUNTIME: 3 #运行多少小时
+  RUNTIME: 0.05 #运行多少小时
 
 jobs:
   main:
     runs-on: ubuntu-latest
     steps:
+      - name: 设置时区
+        run: sudo ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+
       - name: Checkout repository
         uses: actions/checkout@v2
 
