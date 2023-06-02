@@ -13,7 +13,7 @@ my_chat_id = all_variables.get('MY_CHAT_ID')
 github_run_id = str(all_variables.get('GITHUB_RUN_ID'))
 runtime = 120
 if "GITHUB_ACTIONS" in all_variables:
-    runtime = all_variables.get('RUNTIME')
+    runtime = int(all_variables.get('RUNTIME'))
 
 
 @bot.message_handler(commands=['stop'])
