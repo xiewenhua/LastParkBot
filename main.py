@@ -1,7 +1,7 @@
 import telebot
 import os
 import time
-import datetime
+from datetime import datetime, timedelta
 import pytz
 import threading
 import sys
@@ -11,18 +11,18 @@ all_variables = os.environ
 bot = telebot.TeleBot(all_variables.get('BOT_TOKEN'))
 my_chat_id = all_variables.get('MY_CHAT_ID')
 github_run_id = str(all_variables.get('GITHUB_RUN_ID'))
-runtime = 3
+runtime = 120
 if "GITHUB_ACTIONS" in all_variables:
-    runtime = float(all_variables.get('RUNTIME')) * 3600
-
-
-def get_beijing_time():
-    timezone = pytz.timezone('Asia/Shanghai')
-    now = datetime.datetime.now()
-    return now
+    runtime = all_variables.get('RUNTIME')
 
 
 @bot.message_handler(commands=['stop'])
+def stop_server(message):
+    reply_message = log_message('已成功停止本次服务')
+    bot.reply_to(message, reply_message)
+    bot.stop_polling()
+
+
 def exit_program():
     end_message = log_message('本次服务已结束')
     bot.send_message(my_chat_id, end_message)
@@ -31,7 +31,7 @@ def exit_program():
 
 
 def log_message(message):
-    beijing_time = get_beijing_time()
+    beijing_time = datetime.now()
     message = github_run_id + ' ' + \
         beijing_time.strftime("%Y-%m-%d %H:%M:%S") + ' ' + message
     return message
@@ -48,7 +48,9 @@ def echo_all(message):
 
 
 def start_program():
-    start_message = log_message('服务已启动')
+    end_time = datetime.now()+timedelta(seconds=runtime)
+    formatted_time = end_time.strftime("%Y-%m-%d %H:%M:%S")
+    start_message = log_message(f'服务已启动，并预计{formatted_time}结束本次服务！')
     bot.send_message(my_chat_id, start_message)
     print(start_message)
 

@@ -11,7 +11,7 @@ on:
 env:
   BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
   MY_CHAT_ID: ${{ secrets.MY_CHAT_ID }}
-  RUNTIME: 0.05 #运行多少小时
+  RUNTIME: 10800 #运行多少秒
 
 jobs:
   main:
