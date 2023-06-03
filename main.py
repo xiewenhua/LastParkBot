@@ -50,7 +50,7 @@ def echo_all(message):
 def start_program():
     end_time = datetime.now()+timedelta(seconds=runtime)
     formatted_time = end_time.strftime("%Y-%m-%d %H:%M:%S")
-    start_message = log_message(f'服务已启动，并预计{formatted_time}结束本次服务！')
+    start_message = log_message(f'服务已启动\n并预计{formatted_time}结束本次服务！')
     bot.send_message(my_chat_id, start_message)
     print(start_message)
 
