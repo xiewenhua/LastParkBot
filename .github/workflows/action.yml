@@ -4,8 +4,8 @@ on:
   push:
     branches:
       - dev
-    schedule:
-      - cron: "11 */3 * * *"
+  schedule:
+    - cron: "11 */3 * * *"
   workflow_dispatch:
 
 env:
