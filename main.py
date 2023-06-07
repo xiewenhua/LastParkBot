@@ -20,6 +20,7 @@ if "GITHUB_ACTIONS" in all_variables:
 
 
 def encrypt_message(message):
+    print('加密+1')
     public_key_pem = os.environ.get('PUBLIC_KEY')
     if public_key_pem is None:
         raise ValueError('PUBLIC_KEY environment variable is not set')
