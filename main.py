@@ -35,7 +35,7 @@ def encrypt_message(message):
         )
     )
 
-    return encrypted_message
+    return str(encrypted_message)
 
 
 def decrypt_message(encrypted_message):
