@@ -4,11 +4,15 @@ on:
   push:
     branches:
       - dev
+    schedule:
+      - cron: "11 */3 * * *"
   workflow_dispatch:
 
 env:
   BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
   MY_CHAT_ID: ${{ secrets.MY_CHAT_ID }}
+  PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+  PUBLIC_KEY: ${{ secrets.PUBLIC_KEY }}
   RUNTIME: 10800 #运行多少秒
 
 jobs:
