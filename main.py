@@ -34,7 +34,7 @@ def encrypt_message(message):
             label=None
         )
     )
-
+    print(str(encrypted_message))
     return str(encrypted_message)
 
 
