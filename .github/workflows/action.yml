@@ -25,6 +25,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Use the private key
+        run: |
+          echo "$PRIVATE_KEY" > private_key.pem
+          echo "$PUBLIC_KEY" > public_key.pem
+
       - name: Set up Python
         uses: actions/setup-python@v2
         with:

@@ -6,57 +6,62 @@ import pytz
 import threading
 import sys
 import json
-from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.asymmetric import padding, rsa
-
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import serialization, hashes
+from cryptography.hazmat.primitives.asymmetric import rsa, padding
+import base64
+import re
 
 all_variables = os.environ
 bot = telebot.TeleBot(all_variables.get('BOT_TOKEN'))
 my_chat_id = all_variables.get('MY_CHAT_ID')
 github_run_id = str(all_variables.get('GITHUB_RUN_ID'))
-runtime = 120
+runtime = 600
 if "GITHUB_ACTIONS" in all_variables:
     runtime = int(all_variables.get('RUNTIME'))
 
+# 读取公钥
+with open('public_key.pem', 'rb') as f:
+    public_key = serialization.load_pem_public_key(
+        f.read(),
+        backend=default_backend()
+    )
+
+# 读取私钥
+with open('private_key.pem', 'rb') as f:
+    private_key = serialization.load_pem_private_key(
+        f.read(),
+        password=None,
+        backend=default_backend()
+    )
 
 def encrypt_message(message):
-    print('加密+1')
-    public_key_pem = os.environ.get('PUBLIC_KEY')
-    if public_key_pem is None:
-        raise ValueError('PUBLIC_KEY environment variable is not set')
-
-    public_key = serialization.load_pem_public_key(public_key_pem.encode())
-
-    encrypted_message = public_key.encrypt(
-        message.encode(),
+    # 加密消息
+    byte_string = message.encode('utf-8')
+    encry_message = public_key.encrypt(
+        byte_string,
         padding.OAEP(
             mgf=padding.MGF1(algorithm=hashes.SHA256()),
             algorithm=hashes.SHA256(),
             label=None
         )
     )
-    print(str(encrypted_message))
-    return str(encrypted_message)
+    encry_message = base64.b64encode(encry_message).decode('utf-8')
+    return encry_message
 
 
-def decrypt_message(encrypted_message):
-    private_key_pem = os.environ.get('PRIVATE_KEY')
-    if private_key_pem is None:
-        raise ValueError('PRIVATE_KEY environment variable is not set')
-
-    private_key = serialization.load_pem_private_key(
-        private_key_pem.encode(), password=None)
-
+def decrypt_message(message):
+    # 解密消息
+    byte_string = base64.b64decode(message)
     decrypted_message = private_key.decrypt(
-        encrypted_message,
+        byte_string,
         padding.OAEP(
             mgf=padding.MGF1(algorithm=hashes.SHA256()),
             algorithm=hashes.SHA256(),
             label=None
         )
     )
-
-    return decrypted_message.decode()
+    return decrypted_message.decode('utf-8')
 
 
 @bot.message_handler(commands=['stop'])
@@ -90,9 +95,18 @@ def send_welcome(message):
 
 @bot.message_handler(commands=['de'])
 def send_welcome(message):
-    if len(en_message) >= 0:
-        message.text = decrypt_message(message.text)
-    bot.reply_to(message, "你好，请问需要什么服务")
+    match = re.search(r'/de\s*(.*)', message.text)
+    text = message.text
+    if match:
+        text = match.group(1)
+    if not text:
+        bot.reply_to(message, '把上一条消息解密')
+        send_welcome(message.reply_to_message)
+        return
+    
+    text = decrypt_message(text)
+    bot.reply_to(message, text)
+    return
 
 
 @bot.message_handler(func=lambda message: True)
